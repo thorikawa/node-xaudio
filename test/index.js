@@ -1,18 +1,25 @@
 var XAudio = require('../');
 
 describe('xaudio', function() {
-	it('play music', function(done) {
-		this.timeout(20000);
+	it('play and stop', function(done) {
+		this.timeout(10000);
 		const xAudio = new XAudio.XAudio(44100);
-		xAudio.play(__dirname + '/../assets/spotting.wav');
+		xAudio.play(__dirname + '/../assets/mouth.wav');
 		setTimeout(() => {
-			console.log('before stop');
+			console.log('stop');
 			xAudio.stop();
-			console.log('after stop');
-		}, 10000);
+		}, 2000);
 		setTimeout(() => {
 			console.log('done');
 			done();
-		}, 13000);
-	})
+		}, 3000);
+	});
+	it('done callback', function(done) {
+		this.timeout(10000);
+		const xAudio = new XAudio.XAudio(44100);
+		xAudio.play(__dirname + '/../assets/spotting.wav', function(err) {
+			console.log('done callback');
+			done();
+		});
+	});
 });

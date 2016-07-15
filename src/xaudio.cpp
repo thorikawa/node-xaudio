@@ -13,8 +13,9 @@
 
 using namespace v8;
 
-Nan::Callback *playDoneCallback;
+Nan::Callback *playDoneCallback = NULL;
 Mix_Music *music;
+uv_async_t async; // keep this instance around for as long as we might need to do the periodic callback
 
 NAN_MODULE_INIT(XAudio::Init) {
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
@@ -36,15 +37,25 @@ XAudio::~XAudio() {
 
 }
 
-void XAudio::ChannelFinished(int channel) {
-  //printf("SDLMixer::ChannelFinished(%d)\n", channel);
-  //printf("item %d, playDoneEvent %d\n", item, playDoneEvent);
+void XAudio::MusicFinished() {
+  // Since SDL's callback is not on the thread of node.js event loop and it is not allowed to access
+  // V8 data structure outside of the node.js event loop, we need to send notification to uv async which 
+  // is initialized in the event loop to execute callback method.
+  uv_async_send(&async);
+}
+
+void XAudio::FinishedCalback(uv_async_t* handle) {
+  Nan::HandleScope scope;
   if (playDoneCallback != NULL) {
     playDoneCallback->Call(0, 0);
   }
 }
 
 NAN_METHOD(XAudio::New) {
+
+  uv_loop_t* loop = uv_default_loop();
+  uv_async_init(loop, &async, XAudio::FinishedCalback);
+
   if (info.IsConstructCall()) {
     auto frequency = info[0]->IsUndefined() ? MIX_DEFAULT_FREQUENCY : Nan::To<int>(info[0]).FromJust();
     auto format = info[1]->IsUndefined() ? MIX_DEFAULT_FORMAT : Nan::To<int>(info[1]).FromJust();
@@ -59,7 +70,7 @@ NAN_METHOD(XAudio::New) {
     // obj->Wrap(info.This());
     // info.GetReturnValue().Set(info.This());
 
-    Mix_ChannelFinished(ChannelFinished);
+    Mix_HookMusicFinished(XAudio::MusicFinished);
 
   } else {
     const int argc = 1;
@@ -71,13 +82,16 @@ NAN_METHOD(XAudio::New) {
 
 NAN_METHOD(XAudio::Play) {
   Nan::Utf8String filePath(info[0]);
-  playDoneCallback = new Nan::Callback(info[1].As<Function>());
+  auto func = info[1].As<Function>();
+  if (info[1]->IsFunction()) {
+    playDoneCallback = new Nan::Callback(info[1].As<Function>());
+  }
   music = Mix_LoadMUS(*filePath);
   if (!music) {
     return Nan::ThrowError(Mix_GetError());
   }
   Mix_VolumeMusic(64);
-  if (Mix_PlayMusic(music, -1) == -1) {
+  if (Mix_PlayMusic(music, 1) == -1) {
     return Nan::ThrowError(Mix_GetError());
   }
 }

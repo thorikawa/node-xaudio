@@ -12,7 +12,8 @@ public:
 private:
   explicit XAudio();
   ~XAudio();
-  static void ChannelFinished(int channel);
+  static void MusicFinished();
+  static void FinishedCalback(uv_async_t* handle);
   static NAN_METHOD(New);
   static NAN_METHOD(Play);
   static NAN_METHOD(Stop);
