@@ -1,5 +1,5 @@
 {
-  "name": "async_work",
+  "name": "xaudio",
   "version": "0.0.0",
   "description": "Cross Platform node.js audio library powered by SDL/SDL_Mixer.",
   "author": "Takahiro Poly Horikawa <horikawa.takahiro@gmail.com>",
