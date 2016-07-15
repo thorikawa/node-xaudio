@@ -2,10 +2,33 @@
   "name": "xaudio",
   "version": "0.0.0",
   "description": "Cross Platform node.js audio library powered by SDL/SDL_Mixer.",
-  "author": "Takahiro Poly Horikawa <horikawa.takahiro@gmail.com>",
+  "author": {
+  	"name": "Takahiro Poly Horikawa",
+  	"email": "horikawa.takahiro@gmail.com"
+  },
+  "binary": {
+    "module_name": "serialport",
+    "module_path": "build/{configuration}/",
+    "host": "https://github.com/EmergingTechnologyAdvisors/node-serialport/releases/download/4.0.1"
+  },
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:thorikawa/node-xaudio.git"
+  },
   "gypfile": true,
   "dependencies": {
-    "nan": "^2.4.0"
+    "nan": "^2.4.0",
+    "node-pre-gyp": "^0.6.29"
+  },
+  "devDependencies": {
+    "node-pre-gyp-github": "^1.3.1"
+  },
+  "license": "MIT",
+  "scripts": {
+    "install": "node-pre-gyp install --fallback-to-build",
+    "rebuild-all": "npm rebuild && node-gyp rebuild",
+    "gyp-rebuild": "node-gyp rebuild",
+    "test": "mocha"
   }
 }
