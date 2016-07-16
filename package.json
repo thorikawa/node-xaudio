@@ -7,14 +7,15 @@
   	"email": "horikawa.takahiro@gmail.com"
   },
   "binary": {
-    "module_name": "serialport",
+    "module_name": "xaudio",
     "module_path": "build/{configuration}/",
-    "host": "https://github.com/EmergingTechnologyAdvisors/node-serialport/releases/download/4.0.1"
+    "host": "https://github.com/thorikawa/node-xaudio/releases/download/",
+    "remote_path": "{version}"
   },
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:thorikawa/node-xaudio.git"
+    "url": "git://github.com/thorikawa/node-xaudio.git"
   },
   "gypfile": true,
   "dependencies": {
